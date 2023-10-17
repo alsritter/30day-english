@@ -14,8 +14,11 @@
   "contributes": {
     "commands": [
       {
-        "command": "30day-english.helloWorld",
-        "title": "Hello World"
+          "command": "extension.toggleCheck",
+          "key": "ctrl+alt+t",
+          "mac": "cmd+alt+t",
+          "when": "editorTextFocus",
+          "title": "Toggle Spelling Check"
       }
     ]
   },

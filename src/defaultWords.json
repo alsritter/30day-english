@@ -1,0 +1,22 @@
+{
+  "Relative": ["Is she a distant relative of yours?", "亲戚"],
+  "Parent": ["Every parent wants the best for their child.", "父母"],
+  "Child/Children": ["They have three children.", "孩子/孩子们"],
+  "Mother": ["My mother called me yesterday.", "母亲"],
+  "Father": ["He is a loving father to his kids.", "父亲"],
+  "Sister": ["I have a younger sister.", "姐妹"],
+  "Brother": ["His brother lives in New York.", "兄弟"],
+  "Grandmother": ["My grandmother used to tell me stories.", "祖母"],
+  "Grandfather": ["We visited our grandfather's grave.", "祖父"],
+  "Aunt": ["My aunt sent a birthday card.", "阿姨"],
+  "Uncle": ["I met my uncle after many years.", "叔叔"],
+  "Cousin": ["My cousin and I are the same age.", "堂兄弟姐妹"],
+  "Niece": ["My niece starts school this year.", "侄女"],
+  "Nephew": ["I bought a gift for my nephew.", "侄子"],
+  "Husband": ["Her husband is a doctor.", "丈夫"],
+  "Wife": ["His wife teaches at a school.", "妻子"],
+  "Daughter": ["Their daughter just graduated.", "女儿"],
+  "Son": ["The son looks like his father.", "儿子"],
+  "Spouse": ["My spouse and I are celebrating our anniversary.", "配偶"],
+  "Partner": ["They are life partners.", "伴侣"]
+}
