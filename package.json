@@ -2,6 +2,12 @@
   "name": "30day-english",
   "displayName": "30day-English Challenge",
   "description": "30 天学习挑战",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alsritter/30day-english"
+  },
+  "publisher": "alsritter",
+  "license": "MIT",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.83.0"

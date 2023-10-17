@@ -7,10 +7,9 @@
 3. **记忆记录视图**：查看您已经练习过的单词和对应的正确/错误次数。
 
 ## 安装
-
 1. 打开 Visual Studio Code。
 2. 转到 Extensions。
-3. 搜索 "30day-English Challenge" 并安装。
+3. 搜索 ["30day-English Challenge"](https://marketplace.visualstudio.com/items?itemName=alsritter.30day-english) 并安装。
 
 ## 使用方法
 1. 在 VS Code 中打开任意文档。
