@@ -12,15 +12,39 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+          {
+              "id":"memory-record-container",
+              "title": "单词记录",
+              "icon": "media/word.svg"
+          }
+      ]
+   },
+   "views": {
+      "memory-record-container": [
+          {
+              "id": "memory-record-view",
+              "name": "Memory Record"
+          }
+      ]
+    },
     "commands": [
       {
-          "command": "extension.toggleCheck",
+          "command": "30dayEnglish.toggleCheck",
           "key": "ctrl+alt+t",
           "mac": "cmd+alt+t",
           "when": "editorTextFocus",
-          "title": "Toggle Spelling Check"
+          "title": "30 Day English: Toggle Spelling Check"
       }
-    ]
+    ],
+    "properties": {
+      "30day-english.wordSamplesPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the word samples file."
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
