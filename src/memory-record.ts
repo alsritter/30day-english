@@ -1,21 +1,39 @@
 import * as vscode from 'vscode'
 
-// MemoryRecord Tree View related logic
+export class MemoryRecordDateItem extends vscode.TreeItem {
+  constructor(
+    public readonly date: string,
+    public readonly wordItems: MemoryRecordItem[]
+  ) {
+    super(date, vscode.TreeItemCollapsibleState.Collapsed)
+    this.contextValue = 'memoryRecordDateItem'
+  }
+}
+
 export class MemoryRecordItem extends vscode.TreeItem {
   constructor(
-    public readonly label: string,
-    public readonly description: string
+    public readonly word: string,
+    public readonly correct: number,
+    public readonly wrong: number
   ) {
-    super(label, vscode.TreeItemCollapsibleState.None)
-    this.tooltip = `${this.label}: ${this.description}`
+    super(word, vscode.TreeItemCollapsibleState.None)
+    this.description = `Correct: ${this.correct}, Wrong: ${this.wrong}`
+    this.tooltip = `${this.word}: ${this.description}`
     this.contextValue = 'memoryRecordItem'
   }
 }
 
 export class MemoryRecordProvider
-  implements vscode.TreeDataProvider<MemoryRecordItem>
+  implements vscode.TreeDataProvider<vscode.TreeItem>
 {
-  private memoryRecord: { [word: string]: { correct: number; wrong: number } }
+  private memoryRecord: {
+    [date: string]: {
+      [word: string]: {
+        correct: number
+        wrong: number
+      }
+    }
+  }
   private _onDidChangeTreeData: vscode.EventEmitter<
     MemoryRecordItem | undefined | void
   > = new vscode.EventEmitter<MemoryRecordItem | undefined | void>()
@@ -24,7 +42,12 @@ export class MemoryRecordProvider
   > = this._onDidChangeTreeData.event
 
   constructor(memoryRecord: {
-    [word: string]: { correct: number; wrong: number }
+    [date: string]: {
+      [word: string]: {
+        correct: number
+        wrong: number
+      }
+    }
   }) {
     this.memoryRecord = memoryRecord
   }
@@ -33,17 +56,23 @@ export class MemoryRecordProvider
     this._onDidChangeTreeData.fire()
   }
 
-  getTreeItem(element: MemoryRecordItem): vscode.TreeItem {
+  getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
     return element
   }
 
-  getChildren(element?: MemoryRecordItem): Thenable<MemoryRecordItem[]> {
-    if (!element) {
+  getChildren(element?: vscode.TreeItem): Thenable<vscode.TreeItem[]> {
+    if (element) {
+      if (element.contextValue === 'memoryRecordDateItem') {
+        return Promise.resolve((element as MemoryRecordDateItem).wordItems)
+      }
+    } else {
       return Promise.resolve(
-        Object.keys(this.memoryRecord).map((key) => {
-          const record = this.memoryRecord[key]
-          const description = `Correct: ${record.correct}, Wrong: ${record.wrong}`
-          return new MemoryRecordItem(key, description)
+        Object.keys(this.memoryRecord).map((date) => {
+          const wordItems = Object.keys(this.memoryRecord[date]).map((word) => {
+            const record = this.memoryRecord[date][word]
+            return new MemoryRecordItem(word, record.correct, record.wrong)
+          })
+          return new MemoryRecordDateItem(date, wordItems)
         })
       )
     }

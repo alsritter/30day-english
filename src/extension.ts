@@ -8,11 +8,21 @@ let statusBar: vscode.StatusBarItem
 let currentWord: string
 const specialWordMappings: { [key: string]: string } = {}
 const wordSamples: { [key: string]: [string, string] } = {}
-const memoryRecord: { [word: string]: { correct: number; wrong: number } } = {}
+const memoryRecord: {
+  [date: string]: {
+    [word: string]: {
+      correct: number
+      wrong: number
+    }
+  }
+} = {}
 
 export function activate(context: vscode.ExtensionContext) {
   initializeStatusBarItems(context)
   initializeToggleCheckItem(context)
+
+  // 从 globalState 加载 memoryRecord
+  loadMemoryRecord(context)
 
   const memoryRecordProvider = new MemoryRecordProvider(memoryRecord)
 
@@ -23,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Listen for changes to the text document and trigger checks
   vscode.workspace.onDidChangeTextDocument((event) =>
-    handleDocumentChange(event, memoryRecordProvider)
+    handleDocumentChange(event, memoryRecordProvider, context)
   )
 
   // Load the word samples upon activation
@@ -109,10 +119,39 @@ function initializeToggleCheckItem(
   return toggleCheckItem
 }
 
+// 从 globalState 加载 memoryRecord
+function loadMemoryRecord(context: vscode.ExtensionContext) {
+  const storedMemoryRecord = context.globalState.get<{
+    [date: string]: {
+      [word: string]: {
+        correct: number
+        wrong: number
+      }
+    }
+  }>('memoryRecord')
+
+  if (storedMemoryRecord) {
+    for (const date in storedMemoryRecord) {
+      if (!memoryRecord[date]) {
+        memoryRecord[date] = {}
+      }
+      for (const word in storedMemoryRecord[date]) {
+        memoryRecord[date][word] = storedMemoryRecord[date][word]
+      }
+    }
+  }
+}
+
+// 保存 memoryRecord 到 globalState
+function saveMemoryRecord(context: vscode.ExtensionContext) {
+  context.globalState.update('memoryRecord', memoryRecord)
+}
+
 function checkLastLine(
   editor: vscode.TextEditor,
   event: vscode.TextDocumentChangeEvent,
-  memoryRecordProvider: MemoryRecordProvider
+  memoryRecordProvider: MemoryRecordProvider,
+  context: vscode.ExtensionContext
 ) {
   function getNextKey(currentKey: string): string | undefined {
     const keys = Object.keys(wordSamples)
@@ -140,8 +179,12 @@ function checkLastLine(
       (key) => cleanString(key) === word
     )
 
-    if (!memoryRecord[currentWord]) {
-      memoryRecord[currentWord] = { correct: 0, wrong: 0 }
+    if (!memoryRecord[getDate()]) {
+      memoryRecord[getDate()] = {}
+    }
+
+    if (!memoryRecord[getDate()][currentWord]) {
+      memoryRecord[getDate()][currentWord] = { correct: 0, wrong: 0 }
     }
 
     if (matchKey) {
@@ -149,7 +192,8 @@ function checkLastLine(
         `Correct! ${wordSamples[matchKey][0]}`
       )
 
-      memoryRecord[currentWord].correct = (memoryRecord[currentWord].correct || 0) + 1
+      memoryRecord[getDate()][currentWord].correct =
+        (memoryRecord[getDate()][currentWord].correct || 0) + 1
 
       // Update the status bar with the next word's Chinese hint
       const nextKey = getNextKey(matchKey)
@@ -159,9 +203,18 @@ function checkLastLine(
       } else {
         statusBar.text = 'Well done!'
       }
+
+      // 保存 memoryRecord
+      saveMemoryRecord(context)
     } else {
-      vscode.window.showErrorMessage(`Incorrect! ${wordSamples[currentWord][0]}`)
-      memoryRecord[currentWord].wrong = (memoryRecord[currentWord].wrong || 0) + 1
+      vscode.window.showErrorMessage(
+        `Incorrect! ${wordSamples[currentWord][0]}`
+      )
+      memoryRecord[getDate()][currentWord].wrong =
+        (memoryRecord[getDate()][currentWord].wrong || 0) + 1
+
+      // 保存 memoryRecord
+      saveMemoryRecord(context)
     }
 
     // 删除最后一行
@@ -180,14 +233,20 @@ function cleanString(str: string): string {
   return specialWordMappings[cleaned] || cleaned
 }
 
+function getDate(): string {
+  const today = new Date().toISOString().split('T')[0] // 获取 YYYY-MM-DD 格式的日期
+  return today
+}
+
 function handleDocumentChange(
   event: vscode.TextDocumentChangeEvent,
-  memoryRecordProvider: MemoryRecordProvider
+  memoryRecordProvider: MemoryRecordProvider,
+  context: vscode.ExtensionContext
 ) {
   if (event.document.isDirty && !event.document.isUntitled) {
     const editor = vscode.window.activeTextEditor
     if (editor) {
-      checkLastLine(editor, event, memoryRecordProvider)
+      checkLastLine(editor, event, memoryRecordProvider, context)
     }
   }
 }

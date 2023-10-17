@@ -1,7 +1,7 @@
 {
   "name": "30day-english",
-  "displayName": "30Day English",
-  "description": "30 天学习计划",
+  "displayName": "30day-English Challenge",
+  "description": "30 天学习挑战",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.83.0"
